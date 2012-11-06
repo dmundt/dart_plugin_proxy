@@ -2,10 +2,9 @@
 library plugin_proxy;
 
 import 'dart:isolate';
-import 'dart:mirrors';
 
 abstract class Plugin {
-  String value;
+  var value;
   inc(num value);
   add(num value1, num value2);
 }
