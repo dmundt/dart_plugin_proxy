@@ -1,0 +1,8 @@
+name:  dart-plugin-isolate
+description:  An example project implementing a simple plugin architecture
+
+dependencies:
+  args:
+    sdk: args
+  meta:
+    sdk: meta
