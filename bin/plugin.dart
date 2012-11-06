@@ -1,12 +1,14 @@
 
+library plugin;
+
 import 'dart:isolate';
 import 'dart:mirrors';
-//import 'package:meta/meta.dart';
 import 'plugin_proxy.dart';
 
 class ComputePlugin implements Plugin {
-  inc(num value) => value + 1;
-  add(num value1, num value2) => value1 + value2;
+  var value = '';
+  inc(value) => value + 1;
+  add(value1, value2) => value1 + value2;
 }
 
 main() {
