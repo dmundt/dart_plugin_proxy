@@ -20,6 +20,7 @@ class PluginProxy implements Plugin {
 
   get value => _sender.call(['get:value', []]);
   set value(value) => _sender.call(['set:value', [value]]);
+
   inc(value) => _sender.call(['inc', [value]]);
   add(value1, value2) => _sender.call(['add', [value1, value2]]);
 }
