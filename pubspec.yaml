@@ -1,10 +1,7 @@
-name:  dart-plugin-isolate
-description:  An example project implementing a simple plugin architecture
+name: dart_plugin_isolate
+description: An example Dart project implementing a simple plugin architecture, which dynamically loads plugins in the VM and executes them in an isolate seen through a plugin proxy. The method call serialization is all done automatically with some noSuchMethod() magic.
 
-dependencies:
 #  args:
 #    sdk: args
 #  meta:
 #    sdk: meta
-  unittest:
-    sdk: unittest

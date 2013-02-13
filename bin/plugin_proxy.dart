@@ -1,39 +1,51 @@
-
 library plugin_proxy;
 
 import 'dart:isolate';
 
+// Universal plugin proxy for calling remote object instances
+// living in another isolate.
+class PluginProxy {
+  final SendPort _sender;
+
+  PluginProxy(this._sender);
+  PluginProxy.spawnUri(String uri) : _sender = spawnUri(uri);
+
+  // Automatic method/setter/getter call serializer.
+  noSuchMethod(InvocationMirror mirror) {
+    var memberName = mirror.memberName;
+    if (mirror.isSetter) {
+      memberName = 'set:$memberName'.replaceAll('=', '');
+    } else if (mirror.isGetter) {
+      memberName = 'get:$memberName';
+    }
+    return _sender.call([memberName, mirror.positionalArguments]);
+  }
+}
+
+// Interface declaration of proxy and remote class for testing the
+// universal plugin proxy.
 abstract class Plugin {
   var value;
   inc(num value);
   add(num value1, num value2);
 }
 
-class PluginProxy implements Plugin {
-  SendPort _sender;
-
-  PluginProxy(this._sender);
-  PluginProxy.spawnUri(String uri) {
-    _sender = spawnUri(uri);
-  }
-
-  get value => _sender.call(['get:value', []]);
-  set value(value) => _sender.call(['set:value', [value]]);
-
-  inc(value) => _sender.call(['inc', [value]]);
-  add(value1, value2) => _sender.call(['add', [value1, value2]]);
+// Local proxy class for the remote plugin living in another isolate.
+// The plugin code is dynamically loaded by only referencing the script name.
+class ComputePluginProxy extends PluginProxy implements Plugin {
+  ComputePluginProxy() : super.spawnUri('plugin.dart');
 }
 
 main() {
-  var proxy = new PluginProxy.spawnUri('plugin.dart');
+  var proxy = new ComputePluginProxy();
   proxy.inc(1).then((result) {
-    print('inc result: $result');
+    print('inc: $result');
   });
-  proxy.add(10.4, 12).then((result) {
-    print('add result: $result');
+  proxy.add(42, 13).then((result) {
+    print('add: $result');
   });
   proxy.value = 'Hello World!';
   proxy.value.then((result) {
-    print('val result: $result');
+    print('val: $result');
   });
 }
