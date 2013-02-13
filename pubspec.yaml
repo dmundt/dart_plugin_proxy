@@ -1,4 +1,5 @@
 name: dart_plugin_proxy
+version: 0.1.1
 author: Daniel Schubert
 description: An example Dart project implementing a simple plugin architecture, which dynamically loads plugins in the VM and executes them in an isolate seen through a plugin proxy. The method call serialization is all done automatically with some noSuchMethod() magic.
 homepage: https://github.com/danschubert/dart_plugin_proxy
