@@ -1,6 +1,5 @@
 library plugin_proxy;
 
-import 'dart:async';
 import 'dart:isolate';
 
 // Universal plugin proxy for calling remote object instances
@@ -15,14 +14,16 @@ class Proxy {
   // Limitations:
   //   - no named arguments
   //   - no closures / callbacks
-  noSuchMethod(InvocationMirror mirror) {
+  noSuchMethod(Invocation mirror) {
     var memberName = mirror.memberName;
     if (mirror.isSetter) {
-      memberName = 'set:$memberName'.replaceAll('=', '');
+      memberName = memberName.replaceAll('=', '');
+      return _sender.call(['s', memberName, mirror.positionalArguments[0]]);
     } else if (mirror.isGetter) {
-      memberName = 'get:$memberName';
+      return _sender.call(['g', memberName]);
+    } else {
+      return _sender.call(['f', memberName, mirror.positionalArguments]);
     }
-    return _sender.call([memberName, mirror.positionalArguments]);
   }
 }
 

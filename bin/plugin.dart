@@ -1,6 +1,5 @@
 library plugin;
 
-import 'dart:async';
 import 'dart:isolate';
 import 'dart:mirrors';
 import 'plugin_proxy.dart';
@@ -15,16 +14,26 @@ class PluginImpl implements Plugin {
 }
 
 void publish(dynamic obj) {
-  var mirror = reflect(obj);
-  port.receive((var msg, SendPort replyTo) {
-    mirror.invoke(msg[0], msg[1]).then((mirror) {
-      if (replyTo != null) {
-        if (mirror.reflectee != null) {
-          replyTo.send(mirror.reflectee);
-        }
-      }
-    });
-  });
+  var mirror = reflect(plugin);
+
+  // Method/getter/setter deserialization.
+  port.receive((msg, replyTo) {
+    assert(replyTo != null);
+
+    var memberType = msg[0];
+    var memberName = new Symbol(msg[1]);
+
+    if (memberType == 's') {
+      mirror.setFieldAsync(memberName, msg[2]);
+    } else if (memberType == 'g') {
+      mirror.getFieldAsync(memberName).then((mirror) {
+        replyTo.send(mirror.reflectee);
+      });
+    } else if (memberType == 'f') {
+      mirror.invokeAsync(memberName, msg[2]).then((mirror) {
+        replyTo.send(mirror.reflectee);
+      });
+    }
 }
 
 main() {
