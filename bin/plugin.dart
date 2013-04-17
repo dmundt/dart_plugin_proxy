@@ -14,15 +14,15 @@ class PluginImpl implements Plugin {
 }
 
 void publish(dynamic obj) {
-  var mirror = reflect(plugin);
+  var mirror = reflect(obj);
 
-  // Method/getter/setter deserialization.
   port.receive((msg, replyTo) {
     assert(replyTo != null);
 
     var memberType = msg[0];
     var memberName = new Symbol(msg[1]);
 
+    // Method/getter/setter deserialization.
     if (memberType == 's') {
       mirror.setFieldAsync(memberName, msg[2]);
     } else if (memberType == 'g') {
@@ -34,6 +34,7 @@ void publish(dynamic obj) {
         replyTo.send(mirror.reflectee);
       });
     }
+  });
 }
 
 main() {
