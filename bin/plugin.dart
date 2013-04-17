@@ -22,14 +22,14 @@ void publish(dynamic obj) {
     var memberType = msg[0];
     var memberName = new Symbol(msg[1]);
 
-    // Method/getter/setter deserialization.
+    // Getter/setter/method deserialization.
     if (memberType == 's') {
       mirror.setFieldAsync(memberName, msg[2]);
     } else if (memberType == 'g') {
       mirror.getFieldAsync(memberName).then((mirror) {
         replyTo.send(mirror.reflectee);
       });
-    } else if (memberType == 'f') {
+    } else if (memberType == 'm') {
       mirror.invokeAsync(memberName, msg[2]).then((mirror) {
         replyTo.send(mirror.reflectee);
       });

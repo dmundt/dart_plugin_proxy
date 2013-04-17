@@ -10,19 +10,19 @@ class Proxy {
   Proxy(this._sender);
   Proxy.spawnUri(String uri) : _sender = spawnUri(uri);
 
-  // Automatic method/setter/getter call serializer.
+  // Automatic setter/getter/method call serializer.
   // Limitations:
-  //   - no named arguments
+  //   - no named arguments for methods
   //   - no closures / callbacks
-  noSuchMethod(Invocation mirror) {
-    var memberName = mirror.memberName;
-    if (mirror.isSetter) {
+  noSuchMethod(Invocation invocation) {
+    var memberName = invocation.memberName;
+    if (invocation.isSetter) {
       memberName = memberName.replaceAll('=', '');
-      return _sender.call(['s', memberName, mirror.positionalArguments[0]]);
-    } else if (mirror.isGetter) {
+      return _sender.call(['s', memberName, invocation.positionalArguments[0]]);
+    } else if (invocation.isGetter) {
       return _sender.call(['g', memberName]);
-    } else {
-      return _sender.call(['f', memberName, mirror.positionalArguments]);
+    } else if (invocation.isMethod) {
+      return _sender.call(['m', memberName, invocation.positionalArguments]);
     }
   }
 }
