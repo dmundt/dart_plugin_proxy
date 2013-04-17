@@ -11,14 +11,16 @@ class PluginProxy {
   PluginProxy.spawnUri(String uri) : _sender = spawnUri(uri);
 
   // Automatic method/setter/getter call serializer.
-  noSuchMethod(InvocationMirror mirror) {
+  noSuchMethod(Invocation mirror) {
     var memberName = mirror.memberName;
     if (mirror.isSetter) {
-      memberName = 'set:$memberName'.replaceAll('=', '');
+      memberName = memberName.replaceAll('=', '');
+      return _sender.call(['s', memberName, mirror.positionalArguments[0]]);
     } else if (mirror.isGetter) {
-      memberName = 'get:$memberName';
+      return _sender.call(['g', memberName]);
+    } else {
+      return _sender.call(['f', memberName, mirror.positionalArguments]);
     }
-    return _sender.call([memberName, mirror.positionalArguments]);
   }
 }
 
