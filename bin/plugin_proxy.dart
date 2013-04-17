@@ -1,16 +1,20 @@
 library plugin_proxy;
 
+import 'dart:async';
 import 'dart:isolate';
 
 // Universal plugin proxy for calling remote object instances
 // living in another isolate.
-class PluginProxy {
+class Proxy {
   final SendPort _sender;
 
-  PluginProxy(this._sender);
-  PluginProxy.spawnUri(String uri) : _sender = spawnUri(uri);
+  Proxy(this._sender);
+  Proxy.spawnUri(String uri) : _sender = spawnUri(uri);
 
   // Automatic method/setter/getter call serializer.
+  // Limitations:
+  //   - no named arguments
+  //   - no closures / callbacks
   noSuchMethod(InvocationMirror mirror) {
     var memberName = mirror.memberName;
     if (mirror.isSetter) {
@@ -32,12 +36,12 @@ abstract class Plugin {
 
 // Local proxy class for the remote plugin living in another isolate.
 // The plugin code is dynamically loaded by only referencing the script name.
-class ComputePluginProxy extends PluginProxy implements Plugin {
-  ComputePluginProxy() : super.spawnUri('plugin.dart');
+class PluginProxy extends Proxy implements Plugin {
+  PluginProxy() : super.spawnUri('plugin.dart');
 }
 
 main() {
-  var proxy = new ComputePluginProxy();
+  var proxy = new PluginProxy();
   proxy.inc(1).then((result) {
     print('inc: $result');
   });
